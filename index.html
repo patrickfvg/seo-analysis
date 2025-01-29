@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SEO Analyzer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">SEO Analysis Tool</h1>
+        
+        <form method="POST">
+            <div class="input-group mb-3">
+                <input type="url" class="form-control" name="url" placeholder="Enter website URL" required>
+                <button class="btn btn-primary" type="submit">Analyze</button>
+            </div>
+        </form>
+
+        {% if results %}
+            <div class="results mt-4">
+                <h2>Analysis for {{ url }}</h2>
+                
+                <!-- Title Analysis -->
+                <div class="card mb-3 {% if results.title_length > 60 %}border-warning{% endif %}">
+                    <div class="card-body">
+                        <h5>Title Tag</h5>
+                        <p>{{ results.title }} ({{ results.title_length }} characters)</p>
+                        {% if results.title_length == 0 %}
+                            <div class="alert alert-danger">Add a title tag!</div>
+                        {% elif results.title_length > 60 %}
+                            <div class="alert alert-warning">Shorten title (ideal: 50-60 characters)</div>
+                        {% else %}
+                            <div class="alert alert-success">Good title length!</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Meta Description -->
+                <div class="card mb-3 {% if results.meta_desc_length > 160 %}border-warning{% endif %}">
+                    <div class="card-body">
+                        <h5>Meta Description</h5>
+                        <p>{{ results.meta_description }} ({{ results.meta_desc_length }} characters)</p>
+                        {% if results.meta_desc_length == 0 %}
+                            <div class="alert alert-danger">Add meta description!</div>
+                        {% elif results.meta_desc_length > 160 %}
+                            <div class="alert alert-warning">Shorten description (ideal: 150-160)</div>
+                        {% else %}
+                            <div class="alert alert-success">Good description length!</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Headers -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Header Tags</h5>
+                        <h6>H1 Tags ({{ results.h1|length }}):</h6>
+                        <ul>
+                            {% for h in results.h1 %}
+                                <li>{{ h }}</li>
+                            {% endfor %}
+                        </ul>
+                        <h6>H2 Tags ({{ results.h2|length }}):</h6>
+                        <ul>
+                            {% for h in results.h2 %}
+                                <li>{{ h }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Images without Alt -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Images Missing Alt Text ({{ results.images_without_alt|length }})</h5>
+                        {% if results.images_without_alt %}
+                            <div class="alert alert-danger">
+                                {% for img in results.images_without_alt %}
+                                    <p>{{ img }}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success">All images have alt text! ✅</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Keywords -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Keyword Frequency</h5>
+                        <ul>
+                            {% for keyword, count in results.keyword_count.items() %}
+                                <li><strong>{{ keyword }}</strong>: {{ count }} times</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
